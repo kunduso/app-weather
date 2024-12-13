@@ -17,7 +17,7 @@ namespace WeatherWeb.Services
         {
             try
             {
-                var requestUrl = $"http://weatherapi:8080/weather/{location}";
+                var requestUrl = $"http://weatherapi/weather/{location}";  // Removed :8080
                 _logger.LogInformation($"Attempting to call API at: {requestUrl}");
 
                 var response = await _client.GetAsync(requestUrl);
