@@ -29,18 +29,17 @@ namespace WeatherApi.Services
                 _logger.LogInformation("Calling OpenWeatherMap API: {Url}", url);
 
                 var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                
                 var content = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogError("Error from OpenWeatherMap API: {StatusCode}, Content: {Content}", 
-                        response.StatusCode, content);
-                    return null;
-                }
-
                 _logger.LogInformation("Received response: {Content}", content);
 
-                var weatherResponse = JsonSerializer.Deserialize<OpenWeatherMapResponse>(content);
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var weatherResponse = JsonSerializer.Deserialize<OpenWeatherMapResponse>(content, options);
 
                 if (weatherResponse == null)
                 {
@@ -50,8 +49,8 @@ namespace WeatherApi.Services
 
                 var weatherData = new WeatherData
                 {
-                    Location = weatherResponse.Name,
-                    Temperature = Math.Round(weatherResponse.Main.Temp, 1),
+                    Location = weatherResponse.Name ?? location,
+                    Temperature = Math.Round(weatherResponse.Main?.Temp ?? 0, 1),
                     Unit = "Celsius"
                 };
 
