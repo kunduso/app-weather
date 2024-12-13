@@ -8,10 +8,10 @@ namespace WeatherApi.Models
 
     public class MainData
     {
-        public float Temp { get; set; }
-        public float Feels_like { get; set; }
-        public float Temp_min { get; set; }
-        public float Temp_max { get; set; }
+        public double Temp { get; set; }  // Change from float to double
+        public double Feels_like { get; set; }
+        public double Temp_min { get; set; }
+        public double Temp_max { get; set; }
         public int Humidity { get; set; }
     }
 }
