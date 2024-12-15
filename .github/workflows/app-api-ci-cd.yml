@@ -110,7 +110,7 @@ jobs:
   #   defaults:
   #     run:
   #       shell: bash
-  #       working-directory: ./deploy
+  #       working-directory: ./application/WeatherApi/deploy
   #   steps:
   #   # Checkout the repository to the GitHub Actions runner
   #   - name: Checkout
