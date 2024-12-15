@@ -35,13 +35,13 @@ jobs:
         working-directory: ./application/WeatherApi
     steps:
     # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Debug event info
       run: |
         echo "Event name: ${{ github.event_name }}"
         echo "Event type: ${{ github.event.pull_request.type }}"
         echo "GitHub ref: ${{ github.ref }}"
-    - name: Checkout
-      uses: actions/checkout@v3
     - name: Generate Image Tag
       id: tag
       run: echo "TAG_NAME=$(date +'%Y%m%d').${{ github.run_number }}.${{ github.run_attempt }}" >> $GITHUB_ENV
