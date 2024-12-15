@@ -33,3 +33,60 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+# Build Folders
+bin/
+obj/
+
+# Visual Studio temporary files
+.vs/
+.vscode/
+*.user
+*.userprefs
+*.suo
+*.sln.docstates
+
+# Rider-specific files
+.idea/
+
+# Dependency folders
+node_modules/
+packages/
+
+# ASP.NET Core user secrets
+secrets/
+
+# Config settings
+appsettings.Development.json
+appsettings.Test.json
+
+# Environment files
+*.env
+
+# Visual Studio Code artifacts
+*.code-workspace
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg
+*.nuspec
+
+# Build artifacts
+publish/
+
+# Docker-related caches
+.docker/
+
+# Coverage reports
+coverage/
+
+# Log files
+*.log
+
+# Test result directories
+TestResults/
+
+# Exclude files for .NET Publish
+!.gitkeep
