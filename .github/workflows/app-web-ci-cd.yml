@@ -5,13 +5,11 @@ on:
     branches: [ '*' ]
     paths:
       - 'application/WeatherWeb/**'
-      - 'deploy/WeatherWeb/**'
       - '.github/workflows/app-web-ci-cd.yml'
   pull_request:
     branches: ["main"]
     paths:
       - 'application/WeatherWeb/**'
-      - 'deploy/WeatherWeb/**'
       - '.github/workflows/app-web-ci-cd.yml'
 
 env:
@@ -109,7 +107,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./deploy
+        working-directory: ./application/WeatherWeb/deploy
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
