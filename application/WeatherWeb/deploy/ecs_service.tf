@@ -1,14 +1,14 @@
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service
 resource "aws_ecs_service" "service" {
-  name                 = var.name
+  name                 = "${var.name}-web"
   cluster              = local.infra_output["aws_ecs_cluster_id"]
   task_definition      = aws_ecs_task_definition.web_app.arn
   desired_count        = 2
   force_new_deployment = true
   load_balancer {
     target_group_arn = local.infra_output["aws_lb_target_group_arn"]
-    container_name   = "first"
-    container_port   = "8080" # Application Port
+    container_name   = "web"
+    container_port   = "80"
   }
   launch_type = "FARGATE"
   network_configuration {
@@ -21,10 +21,10 @@ resource "aws_ecs_service" "service" {
     namespace = local.infra_output["service_namespace_arn"]
     service {
       port_name = "http"
-      discovery_name = "service-one"
+      discovery_name = "${var.name}-web"
       client_alias {
         port = 80
-        dns_name = "service-one.app-6"
+        dns_name = "${var.name}-web"
       }
     }
     log_configuration {

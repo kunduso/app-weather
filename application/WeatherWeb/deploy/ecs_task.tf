@@ -14,7 +14,7 @@ resource "aws_ecs_task_definition" "web_app" {
 
   container_definitions = jsonencode([
     {
-      name                   = "first"
+      name                   = "web"
       image                  = var.image_tag
       memory                 = 512
       essential              = true
@@ -22,8 +22,8 @@ resource "aws_ecs_task_definition" "web_app" {
       portMappings = [
         {
           name = "http"
-          containerPort = 8080
-          hostPort      = 8080
+          containerPort = 80
+          hostPort      = 8081
           protocol      = "tcp"
           appProtocol   = "http"
         }
@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "web_app" {
         }
       }
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:8080/healthcheck>> /proc/1/fd/1 2>&1 || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://localhost:80/healthcheck>> /proc/1/fd/1 2>&1 || exit 1"]
         interval    = 30
         retries     = 3
         timeout     = 5
@@ -47,12 +47,6 @@ resource "aws_ecs_task_definition" "web_app" {
         {
           name  = "AWS_REGION",
           value = var.region
-        }
-      ]
-      secrets = [
-        {
-          name      = "ecs_secret"
-          valueFrom = local.infra_output["secret_arn"]
         }
       ]
     }
