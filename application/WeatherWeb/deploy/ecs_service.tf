@@ -17,21 +17,21 @@ resource "aws_ecs_service" "service" {
     assign_public_ip = false
   }
   service_connect_configuration {
-    enabled = true
+    enabled   = true
     namespace = local.infra_output["service_namespace_arn"]
     service {
-      port_name = "http"
+      port_name      = "http"
       discovery_name = "${var.name}-web"
       client_alias {
-        port = 80
+        port     = 80
         dns_name = "${var.name}-web"
       }
     }
     log_configuration {
       log_driver = "awslogs"
       options = {
-        awslogs-group = local.infra_output["service_connect_log_group_name"]
-        awslogs-region = var.region
+        awslogs-group         = local.infra_output["service_connect_log_group_name"]
+        awslogs-region        = var.region
         awslogs-stream-prefix = "service-connect"
       }
     }

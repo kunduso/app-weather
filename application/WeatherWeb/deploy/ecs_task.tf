@@ -21,7 +21,7 @@ resource "aws_ecs_task_definition" "web_app" {
       readonlyRootFilesystem = true
       portMappings = [
         {
-          name = "http"
+          name          = "http"
           containerPort = 80
           hostPort      = 8081
           protocol      = "tcp"
