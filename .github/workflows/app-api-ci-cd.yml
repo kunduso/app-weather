@@ -35,6 +35,11 @@ jobs:
         working-directory: ./application/WeatherApi
     steps:
     # Checkout the repository to the GitHub Actions runner
+    - name: Debug event info
+      run: |
+        echo "Event name: ${{ github.event_name }}"
+        echo "Event type: ${{ github.event.pull_request.type }}"
+        echo "GitHub ref: ${{ github.ref }}"
     - name: Checkout
       uses: actions/checkout@v3
     - name: Generate Image Tag
@@ -78,12 +83,13 @@ jobs:
         sarif_file: 'trivy-results.sarif'
     # Push the Docker image to Amazon ECR, but only if the even is not a pull request.
     - name: Push docker image to Amazon ECR
+      if: github.event_name != 'pull_request'
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         REPOSITORY: ${{ env.ECR_REPOSITORY }}
         IMAGE_TAG: ${{ env.TAG_NAME }}
       run: docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-      if: github.event_name != 'pull_request'
+
     - name: Create output file
       id: create-output
       env:
