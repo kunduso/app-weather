@@ -4,13 +4,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(80);
+    serverOptions.ListenAnyIP(8081);
 });
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddHttpClient<WeatherService>();
 builder.Services.AddScoped<WeatherService>();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -29,6 +30,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapHealthChecks("/healthcheck");
 
 app.Run();
 
