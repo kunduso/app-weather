@@ -17,6 +17,10 @@ namespace WeatherApi.Services
             _logger = logger;
             _apiKey = _configuration["OpenWeatherMap:ApiKey"] 
                 ?? throw new ArgumentNullException("OpenWeatherMap API key is not configured");
+
+            // Get base URL from environment variable with fallback
+            _baseUrl = Environment.GetEnvironmentVariable("OPENWEATHERMAP_BASE_URL") 
+                ?? "http://api.openweathermap.org/data/2.5";
         }
 
         public async Task<WeatherData?> GetWeatherForLocationAsync(string location)
@@ -25,8 +29,10 @@ namespace WeatherApi.Services
             {
                 _logger.LogInformation("Fetching weather data for {Location}", location);
 
-                var url = $"http://api.openweathermap.org/data/2.5/weather?q={location}&units=metric&appid={_apiKey}";
-                _logger.LogInformation("Calling OpenWeatherMap API: {Url}", url);
+                var url = $"{_baseUrl}/weather?q={location}&units=metric&appid={_apiKey}";
+                // Mask the API key in logs
+                var logUrl = url.Replace(_apiKey, "***");
+                _logger.LogInformation("Calling OpenWeatherMap API: {Url}", logUrl);
 
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
