@@ -17,7 +17,8 @@ namespace WeatherWeb.Services
         {
             try
             {
-                var requestUrl = $"http://weatherapi:8080/weather/{location}";  // Added back :8080
+                var baseUrl = Environment.GetEnvironmentVariable("WEATHER_API_BASE_URL") ?? "http://app-weather-api:8080";
+                var requestUrl = $"{baseUrl}/weather/{location}";
                 _logger.LogInformation($"Attempting to call API at: {requestUrl}");
 
                 var response = await _client.GetAsync(requestUrl);

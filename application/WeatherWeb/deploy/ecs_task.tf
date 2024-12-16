@@ -43,10 +43,14 @@ resource "aws_ecs_task_definition" "web_app" {
         timeout     = 5
         startPeriod = 10
       }
-      environments = [
+      environment = [
         {
           name  = "AWS_REGION",
           value = var.region
+        },
+        {
+          name  = "WEATHER_API_BASE_URL",
+          value = "http://app-weather-api:8080"
         }
       ]
     }
