@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 // Register services
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
@@ -18,5 +19,6 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/healthcheck");
 
 app.Run();
