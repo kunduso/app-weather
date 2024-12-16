@@ -52,14 +52,51 @@ resource "aws_subnet" "private" {
     "Name" = "${var.name}-private-${count.index + 1}"
   }
 }
-resource "aws_route_table" "this_rt_private" {
-  vpc_id = aws_vpc.this.id
+# Create 2 Elastic IPs for NAT Gateways
+resource "aws_eip" "nat" {
+  count  = length(var.subnet_cidr_public)
+  domain = "vpc"
   tags = {
-    "Name" = "${var.name}-route-table-private"
+    Name = "${var.name}-nat-eip-${count.index + 1}"
+  }
+
+  depends_on = [aws_internet_gateway.this_igw]
+}
+
+# Create 2 NAT Gateways, one in each public subnet
+resource "aws_nat_gateway" "this" {
+  count         = 2
+  allocation_id = aws_eip.nat[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
+
+  tags = {
+    Name = "${var.name}-nat-gateway-${count.index + 1}"
+  }
+
+  depends_on = [aws_internet_gateway.this_igw]
+}
+
+# Create separate route tables for each private subnet
+resource "aws_route_table" "private" {
+  count  = length(var.subnet_cidr_private)
+  vpc_id = aws_vpc.this.id
+
+  tags = {
+    Name = "${var.name}-private-rt-${count.index + 1}"
   }
 }
+
+# Add routes to NAT Gateways in the private route tables
+resource "aws_route" "private_nat_gateway" {
+  count                  = length(var.subnet_cidr_private)
+  route_table_id         = aws_route_table.private[count.index].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.this[count.index].id
+}
+
+# Associate private subnets with their respective route tables
 resource "aws_route_table_association" "private" {
   count          = length(var.subnet_cidr_private)
-  subnet_id      = element(aws_subnet.private.*.id, count.index)
-  route_table_id = aws_route_table.this_rt_private.id
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
 }
