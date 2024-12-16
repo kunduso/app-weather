@@ -41,6 +41,6 @@ resource "aws_secretsmanager_secret" "openweathermap" {
 resource "aws_secretsmanager_secret_version" "openweathermap" {
   secret_id = aws_secretsmanager_secret.openweathermap.id
   secret_string = jsonencode({
-    "OpenWeatherMap:ApiKey" = var.openweathermap_api_key
+    "OpenWeatherMap__ApiKey" = var.openweathermap_api_key
   })
 }
