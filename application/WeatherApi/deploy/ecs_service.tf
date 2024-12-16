@@ -3,7 +3,7 @@ resource "aws_ecs_service" "service" {
   name                 = "${var.name}-api"
   cluster              = local.infra_output["aws_ecs_cluster_id"]
   task_definition      = aws_ecs_task_definition.api_app.arn
-  desired_count        = 1
+  desired_count        = 2
   force_new_deployment = true
   launch_type          = "FARGATE"
   network_configuration {
