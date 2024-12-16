@@ -1,6 +1,6 @@
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition
-resource "aws_ecs_task_definition" "web_app" {
-  family                   = var.name
+resource "aws_ecs_task_definition" "api_app" {
+  family                   = "${var.name}-api"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
   network_mode             = "awsvpc"
@@ -14,7 +14,7 @@ resource "aws_ecs_task_definition" "web_app" {
 
   container_definitions = jsonencode([
     {
-      name                   = "first"
+      name                   = "api"
       image                  = var.image_tag
       memory                 = 512
       essential              = true
@@ -43,16 +43,20 @@ resource "aws_ecs_task_definition" "web_app" {
         timeout     = 5
         startPeriod = 10
       }
-      environments = [
+      environment = [
         {
           name  = "AWS_REGION",
           value = var.region
+        },
+        {
+          name  = "OPENWEATHERMAP_BASE_URL",
+          value = "http://api.openweathermap.org/data/2.5"
         }
       ]
       secrets = [
         {
-          name      = "ecs_secret"
-          valueFrom = local.infra_output["secret_arn"]
+          name      = "OpenWeatherMap__ApiKey"
+          valueFrom = aws_secretsmanager_secret.openweathermap.arn
         }
       ]
     }
