@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "ingress_api_container" {
   from_port         = 8080
   to_port           = 8080
   protocol          = "tcp"
-  cidr_blocks       = var.vpc_cidr
+  cidr_blocks       = [var.vpc_cidr]
   security_group_id = aws_security_group.container_sg.id
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule
