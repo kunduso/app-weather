@@ -5,13 +5,11 @@ on:
     branches: [ '*' ]
     paths:
       - 'application/WeatherApi/**'
-      - 'deploy/WeatherApi/**'
       - '.github/workflows/app-api-ci-cd.yml'
   pull_request:
     branches: ["main"]
     paths:
       - 'application/WeatherApi/**'
-      - 'deploy/WeatherApi/**'
       - '.github/workflows/app-api-ci-cd.yml'
 
 env:
@@ -185,6 +183,7 @@ jobs:
       run: |
         terraform plan -no-color -input=false \
         -var="image_tag=${{ env.IMAGE_ID }}" \
+        -var="openweathermap_api_key=${{ secrets.OPENWEATHERMAP_API_KEY }}" \
         -out=TFplan.JSON
       continue-on-error: true
 
@@ -242,4 +241,5 @@ jobs:
       # if: github.ref == 'refs/heads/main'
       run: |
         terraform apply -auto-approve -input=false \
+        -var="openweathermap_api_key=${{ secrets.OPENWEATHERMAP_API_KEY }}" \
         -var="image_tag=${{ env.IMAGE_ID }}" 
