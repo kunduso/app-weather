@@ -8,7 +8,7 @@ resource "aws_ecs_service" "service" {
   load_balancer {
     target_group_arn = local.infra_output["aws_lb_target_group_arn"]
     container_name   = "web"
-    container_port   = "80"
+    container_port   = "8081"
   }
   launch_type = "FARGATE"
   network_configuration {
@@ -23,7 +23,7 @@ resource "aws_ecs_service" "service" {
       port_name      = "http"
       discovery_name = "${var.name}-web"
       client_alias {
-        port     = 80
+        port     = 8081
         dns_name = "${var.name}-web"
       }
     }
