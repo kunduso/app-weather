@@ -16,8 +16,28 @@ namespace WeatherApi.Services
             _httpClient = httpClient;
             _configuration = configuration;
             _logger = logger;
-            _apiKey = _configuration["OpenWeatherMap:ApiKey"] 
-                ?? throw new ArgumentNullException("OpenWeatherMap API key is not configured");
+
+
+            var rawApiKey = _configuration["OpenWeatherMap:ApiKey"] ;
+
+            _logger.LogInformation("OpenWeatherMap API key: {ApiKey}", rawApiKey);
+            try {
+                if(rawApiKey?.StartsWith("{")== true)
+                {
+                    var jsonDoc = JsonDocument.Parse(rawApiKey);
+                    _apiKey = jsonDoc.RootElement.GetProperty("OpenWeatherMap__ApiKey").GetString() 
+                        ?? throw new ArgumentNullException("OpenWeatherMap API key is not found in JSON.");
+                }
+                else
+                {
+                    _apiKey = rawApiKey ?? throw new ArgumentNullException("OpenWeatherMap API key is not configured");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error parsing OpenWeatherMap API key");
+                throw;
+            }
 
             // Get base URL from environment variable with fallback
             _baseUrl = Environment.GetEnvironmentVariable("OPENWEATHERMAP_BASE_URL") 
