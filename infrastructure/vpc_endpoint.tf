@@ -58,6 +58,7 @@ resource "aws_vpc_endpoint" "s3" {
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint_route_table_association
 resource "aws_vpc_endpoint_route_table_association" "s3_association" {
-  route_table_id  = aws_route_table.this_rt_private.id
+  count           = length(var.subnet_cidr_private)
+  route_table_id  = aws_route_table.private[count.index].id
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
 }
