@@ -16,13 +16,14 @@ resource "aws_lb" "app_lb" {
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group
 resource "aws_lb_target_group" "target_group" {
   name        = var.name
-  port        = 80
+  port        = 8081
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.this.id
   health_check {
     matcher = "200,301,302,404"
     path    = "/healthcheck"
+    port    = 8081
   }
   #checkov:skip=CKV_AWS_378: Ensure AWS Load Balancer doesn't use HTTP protocol
   #This is disabled since this is non-prod.
