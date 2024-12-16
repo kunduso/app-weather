@@ -9,6 +9,7 @@ namespace WeatherApi.Services
         private readonly IConfiguration _configuration;
         private readonly ILogger<WeatherService> _logger;
         private readonly string _apiKey;
+        private readonly string _baseUrl;
 
         public WeatherService(HttpClient httpClient, IConfiguration configuration, ILogger<WeatherService> logger)
         {
