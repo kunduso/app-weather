@@ -29,5 +29,5 @@ variable "image_tag" {
 }
 variable "openweathermap_api_key" {
   description = "The API key for OpenWeatherMap."
-  type = string
+  type        = string
 }
