@@ -1,6 +1,6 @@
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role
 resource "aws_iam_role" "ecs_task_role" {
-  name = "${var.name}-web-task-role"
+  name = "${var.name}-api-task-role"
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
   assume_role_policy = jsonencode({
@@ -27,7 +27,7 @@ resource "aws_iam_role" "ecs_task_role" {
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.name}-web-task-execution-role"
+  name = "${var.name}-api-task-execution-role"
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
   assume_role_policy = jsonencode({
@@ -53,7 +53,7 @@ resource "aws_iam_role_policy_attachment" "custom" {
 
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy
 resource "aws_iam_policy" "secrets_manager_read_policy" {
-  name        = "${var.name}-web-ecs-fargate-secrets-manager-access"
+  name        = "${var.name}-api-ecs-fargate-secrets-manager-access"
   description = "IAM policy for ECS Fargate to access Secrets Manager secrets and decrypt it."
 
   policy = jsonencode({
@@ -64,7 +64,7 @@ resource "aws_iam_policy" "secrets_manager_read_policy" {
         Action = [
           "secretsmanager:GetSecretValue"
         ]
-        Resource = [local.infra_output["secret_arn"]]
+        Resource = [aws_secretsmanager_secret.openweathermap.arn]
       },
       {
         Effect = "Allow",
@@ -76,38 +76,10 @@ resource "aws_iam_policy" "secrets_manager_read_policy" {
     ]
   })
 }
-#https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy
-resource "aws_iam_policy" "ecr_access_policy" {
-  name        = "ecr-access-policy"
-  description = "Policy to allow ECR image pulling and KMS decryption"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage"
-        ]
-        Resource = "local.infra_output["ecr_arn"]"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt"
-        ]
-        Resource = "local.infra_output["kms_arn"]"
-      }
-    ]
-  })
-}
 
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy
 resource "aws_iam_policy" "ecs_cloudwatch_logs_policy" {
-  name        = "${var.name}-web-ecs-cloudwatch-logs"
+  name        = "${var.name}-api-ecs-cloudwatch-logs"
   description = "IAM policy for ECS to create and write to CloudWatch Logs."
 
   policy = jsonencode({
@@ -139,17 +111,14 @@ resource "aws_iam_role_policy_attachment" "attach_secrets_read_task_role" {
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = aws_iam_policy.secrets_manager_read_policy.arn
 }
+
 #Attach role to policy
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment
 resource "aws_iam_role_policy_attachment" "attach_secrets_read_task_execution_role" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.secrets_manager_read_policy.arn
 }
-#https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment
-resource "aws_iam_role_policy_attachment" "attach_ecr_access_task_execution_role" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecr_access_policy.arn
-}
+
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment
 resource "aws_iam_role_policy_attachment" "attach_cloudwatch_logs_task_execution_role" {
   role       = aws_iam_role.ecs_task_execution_role.name
