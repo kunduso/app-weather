@@ -27,3 +27,7 @@ variable "image_tag" {
   description = "The name of the Docker image that gets created in the first job and is shared with the deploy job."
   type        = string
 }
+variable "openweathermap_api_key" {
+  description = "The API key for OpenWeatherMap."
+  type        = string
+}

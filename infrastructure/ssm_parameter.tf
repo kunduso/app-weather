@@ -16,7 +16,6 @@ resource "aws_ssm_parameter" "infra_output" {
     "aws_ecs_cluster_name" : "${aws_ecs_cluster.app_cluster.name}",
     "aws_cloudwatch_log_group" : "${aws_cloudwatch_log_group.logs.arn}",
     "aws_cloudwatch_log_group_name" : "${aws_cloudwatch_log_group.logs.name}",
-    "secret_arn" : "${aws_secretsmanager_secret.ecs_secret.arn}",
     "kms_arn" : "${aws_kms_key.custom_kms_key.arn}",
     "service_namespace_arn" : "${aws_service_discovery_http_namespace.namespace.arn}",
     "service_connect_log_group_arn" : "${aws_cloudwatch_log_group.service_connect_logs.arn}"

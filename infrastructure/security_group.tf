@@ -55,6 +55,16 @@ resource "aws_security_group_rule" "ingress_container" {
   security_group_id        = aws_security_group.container_sg.id
 }
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule
+resource "aws_security_group_rule" "ingress_api_container" {
+  description       = "allow traffic into the API containers from the vpc"
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp"
+  cidr_blocks       = [var.vpc_cidr]
+  security_group_id = aws_security_group.container_sg.id
+}
+#https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule
 resource "aws_security_group_rule" "egress_container" {
   description       = "allow traffic to reach the vpc from the container"
   type              = "egress"
