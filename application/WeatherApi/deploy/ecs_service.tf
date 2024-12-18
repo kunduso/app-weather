@@ -33,6 +33,7 @@ resource "aws_ecs_service" "service" {
   }
 }
 resource "aws_secretsmanager_secret" "openweathermap" {
+  #checkov:skip=CKV2_AWS_57: This secret is managed in the Open Weather Map org.
   name                    = "${var.name}-openweathermap-api-key"
   recovery_window_in_days = 0
   kms_key_id              = local.infra_output["kms_arn"]
