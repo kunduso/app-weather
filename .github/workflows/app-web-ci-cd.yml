@@ -81,7 +81,7 @@ jobs:
         REPOSITORY: ${{ env.ECR_REPOSITORY }}
         IMAGE_TAG: ${{ env.TAG_NAME }}
       run: docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+      # if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     - name: Create output file
       id: create-output
       env:
