@@ -10,6 +10,7 @@ namespace WeatherWeb.Services
         public WeatherService(HttpClient client, ILogger<WeatherService> logger)
         {
             _client = client;
+            _client.Timeout = TimeSpan.FromSeconds(30);
             _logger = logger;
         }
 

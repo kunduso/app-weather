@@ -14,6 +14,7 @@ namespace WeatherApi.Services
         public WeatherService(HttpClient httpClient, IConfiguration configuration, ILogger<WeatherService> logger)
         {
             _httpClient = httpClient;
+            _httpClient.Timeout = TimeSpan.FromSeconds(30);
             _configuration = configuration;
             _logger = logger;
 
