@@ -50,7 +50,7 @@ namespace WeatherApi.Services
             {
                 _logger.LogInformation("Fetching weather data for {Location}", location);
 
-                var url = $"{_baseUrl}/weather?q={location}&units=metric&appid={_apiKey}";
+                var url = $"{_baseUrl}/weather?q={location}&units=imperial&appid={_apiKey}";
                 // Mask the API key in logs
                 var logUrl = url.Replace(_apiKey, "***");
                 _logger.LogInformation("Calling OpenWeatherMap API: {Url}", logUrl);
@@ -78,10 +78,10 @@ namespace WeatherApi.Services
                 {
                     Location = weatherResponse.Name ?? location,
                     Temperature = Math.Round(weatherResponse.Main?.Temp ?? 0, 1),
-                    Unit = "Celsius"
+                    Unit = "Fahrenheit"
                 };
 
-                _logger.LogInformation("Processed weather data for {Location}: {Temperature}°C", 
+                _logger.LogInformation("Processed weather data for {Location}: {Temperature}°F", 
                     weatherData.Location, weatherData.Temperature);
 
                 return weatherData;
