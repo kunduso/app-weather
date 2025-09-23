@@ -22,11 +22,22 @@ namespace WeatherApi.Controllers
         {
             try
             {
+                _logger.LogInformation("Received request for location: {Location}", location);
+                
+                if (string.IsNullOrWhiteSpace(location))
+                {
+                    _logger.LogWarning("Empty or null location provided");
+                    return BadRequest("Location cannot be empty");
+                }
+                
                 var weatherData = await _weatherService.GetWeatherForLocationAsync(location);
                 if (weatherData == null)
                 {
-                    return NotFound();
+                    _logger.LogWarning("No weather data returned for location: {Location}", location);
+                    return NotFound($"Weather data not found for {location}");
                 }
+                
+                _logger.LogInformation("Successfully returned weather data for {Location}", location);
                 return Ok(weatherData);
             }
             catch (Exception ex)
