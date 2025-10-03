@@ -22,18 +22,52 @@ namespace WeatherApi.Controllers
         {
             try
             {
+                // Sanitize location for logging to prevent log injection attacks
+                var sanitizedLocation = SanitizeForLogging(location);
+                _logger.LogInformation("Received request for location: {Location}", sanitizedLocation);
+                
+                if (string.IsNullOrWhiteSpace(location))
+                {
+                    _logger.LogWarning("Empty or null location provided");
+                    return BadRequest("Location cannot be empty");
+                }
+                
+                // Validate location contains only safe characters
+                if (location.Any(c => char.IsControl(c) && c != ' '))
+                {
+                    _logger.LogWarning("Invalid characters detected in location parameter");
+                    return BadRequest("Location contains invalid characters");
+                }
+                
                 var weatherData = await _weatherService.GetWeatherForLocationAsync(location);
                 if (weatherData == null)
                 {
-                    return NotFound();
+                    _logger.LogWarning("No weather data returned for location: {Location}", sanitizedLocation);
+                    return NotFound($"Weather data not found for {location}");
                 }
+                
+                _logger.LogInformation("Successfully returned weather data for {Location}", sanitizedLocation);
                 return Ok(weatherData);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting weather for {Location}", location);
+                var sanitizedLocation = SanitizeForLogging(location);
+                _logger.LogError(ex, "Error getting weather for {Location}", sanitizedLocation);
                 return StatusCode(500, "Error retrieving weather data");
             }
+        }
+        
+        private static string SanitizeForLogging(string? input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return "[null/empty]";
+                
+            // Remove control characters and limit length for logging
+            var sanitized = new string(input.Where(c => !char.IsControl(c) || c == ' ')
+                                           .Take(100)
+                                           .ToArray());
+                                           
+            return string.IsNullOrEmpty(sanitized) ? "[invalid]" : sanitized;
         }
     }
 }

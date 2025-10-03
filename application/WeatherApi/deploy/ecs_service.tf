@@ -1,11 +1,12 @@
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service
 resource "aws_ecs_service" "service" {
-  name                 = "${var.name}-api"
-  cluster              = local.infra_output["aws_ecs_cluster_id"]
-  task_definition      = aws_ecs_task_definition.api_app.arn
-  desired_count        = 2
-  force_new_deployment = true
-  launch_type          = "FARGATE"
+  name                              = "${var.name}-api"
+  cluster                           = local.infra_output["aws_ecs_cluster_id"]
+  task_definition                   = aws_ecs_task_definition.api_app.arn
+  desired_count                     = 2
+  force_new_deployment              = true
+  launch_type                       = "FARGATE"
+  health_check_grace_period_seconds = 120
   network_configuration {
     security_groups  = [local.infra_output["container_security_group_id"]]
     subnets          = local.infra_output["subnet_ids"]

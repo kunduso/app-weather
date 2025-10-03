@@ -30,12 +30,33 @@ namespace WeatherWeb.Pages
         {
             if (!string.IsNullOrEmpty(Location))
             {
+                // Validate location contains only safe characters
+                if (Location.Any(c => char.IsControl(c) && c != ' '))
+                {
+                    ErrorMessage = "Location contains invalid characters";
+                    return;
+                }
+                
                 Weather = await _weatherService.GetWeatherForLocation(Location);
                 if (Weather == null)
                 {
-                    ErrorMessage = $"Unable to fetch weather for {Location}";
+                    var sanitizedLocation = SanitizeForDisplay(Location);
+                    ErrorMessage = $"Unable to fetch weather for {sanitizedLocation}";
                 }
             }
+        }
+        
+        private static string SanitizeForDisplay(string? input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return "[invalid location]";
+                
+            // Remove control characters and limit length for display
+            var sanitized = new string(input.Where(c => !char.IsControl(c) || c == ' ')
+                                           .Take(50)
+                                           .ToArray());
+                                           
+            return string.IsNullOrEmpty(sanitized) ? "[invalid location]" : sanitized;
         }
     }
 }
