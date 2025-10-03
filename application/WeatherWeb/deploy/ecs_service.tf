@@ -28,13 +28,6 @@ resource "aws_ecs_service" "service" {
         dns_name = "${var.name}-web"
       }
     }
-    service {
-      port_name = "api"
-      client_alias {
-        port     = 8080
-        dns_name = "${var.name}-api"
-      }
-    }
     log_configuration {
       log_driver = "awslogs"
       options = {
