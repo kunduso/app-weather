@@ -29,6 +29,7 @@ resource "aws_ecs_service" "service" {
       }
     }
     service {
+      port_name = "api"
       client_alias {
         port     = 8080
         dns_name = "${var.name}-api"
