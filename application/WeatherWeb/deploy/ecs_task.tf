@@ -26,6 +26,12 @@ resource "aws_ecs_task_definition" "web_app" {
           hostPort      = 8081
           protocol      = "tcp"
           appProtocol   = "http"
+        },
+        {
+          name          = "api"
+          containerPort = 8080
+          protocol      = "tcp"
+          appProtocol   = "http"
         }
       ]
       logConfiguration = {
