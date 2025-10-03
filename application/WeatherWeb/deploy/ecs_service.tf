@@ -17,25 +17,7 @@ resource "aws_ecs_service" "service" {
     subnets          = local.infra_output["subnet_ids"]
     assign_public_ip = false
   }
-  service_connect_configuration {
-    enabled   = true
-    namespace = local.infra_output["service_namespace_arn"]
-    service {
-      port_name      = "http"
-      discovery_name = "${var.name}-web"
-      client_alias {
-        port     = 8081
-        dns_name = "${var.name}-web"
-      }
-    }
-
-    log_configuration {
-      log_driver = "awslogs"
-      options = {
-        awslogs-group         = local.infra_output["service_connect_log_group_name"]
-        awslogs-region        = var.region
-        awslogs-stream-prefix = "service-connect"
-      }
-    }
+  service_registries {
+    registry_arn = aws_service_discovery_service.web.arn
   }
 }
