@@ -46,7 +46,7 @@ namespace WeatherWeb.Services
             {
                 var sanitizedLocation = SanitizeForLogging(location);
                 _logger.LogError(ex, "Exception while calling weather service for location: {Location}", sanitizedLocation);
-                return null;
+                throw;
             }
         }
         

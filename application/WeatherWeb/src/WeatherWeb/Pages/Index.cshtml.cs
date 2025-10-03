@@ -57,7 +57,14 @@ namespace WeatherWeb.Pages
                 {
                     var sanitizedLocation = SanitizeForDisplay(Location);
                     _logger.LogError(ex, "Error processing weather request for location: {Location}", sanitizedLocation);
-                    ErrorMessage = $"Error retrieving weather data for {sanitizedLocation}. Please try again.";
+                    
+                    // Provide more specific error messages based on exception type
+                    ErrorMessage = ex switch
+                    {
+                        HttpRequestException => $"Unable to connect to weather service for {sanitizedLocation}. Please check your internet connection and try again.",
+                        TaskCanceledException => $"Request timed out while getting weather data for {sanitizedLocation}. Please try again.",
+                        _ => $"Error retrieving weather data for {sanitizedLocation}. Please try again."
+                    };
                 }
             }
         }
