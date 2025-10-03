@@ -30,18 +30,34 @@ namespace WeatherWeb.Pages
         {
             if (!string.IsNullOrEmpty(Location))
             {
-                // Validate location contains only safe characters
-                if (Location.Any(c => char.IsControl(c) && c != ' '))
+                try
                 {
-                    ErrorMessage = "Location contains invalid characters";
-                    return;
+                    // Validate location contains only safe characters
+                    if (Location.Any(c => char.IsControl(c) && c != ' '))
+                    {
+                        ErrorMessage = "Location contains invalid characters";
+                        return;
+                    }
+                    
+                    _logger.LogInformation("Processing weather request for location: {Location}", SanitizeForDisplay(Location));
+                    
+                    Weather = await _weatherService.GetWeatherForLocation(Location);
+                    if (Weather == null)
+                    {
+                        var sanitizedLocation = SanitizeForDisplay(Location);
+                        ErrorMessage = $"Unable to fetch weather for {sanitizedLocation}";
+                        _logger.LogWarning("No weather data returned for location: {Location}", sanitizedLocation);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Successfully retrieved weather data for location: {Location}", SanitizeForDisplay(Location));
+                    }
                 }
-                
-                Weather = await _weatherService.GetWeatherForLocation(Location);
-                if (Weather == null)
+                catch (Exception ex)
                 {
                     var sanitizedLocation = SanitizeForDisplay(Location);
-                    ErrorMessage = $"Unable to fetch weather for {sanitizedLocation}";
+                    _logger.LogError(ex, "Error processing weather request for location: {Location}", sanitizedLocation);
+                    ErrorMessage = $"Error retrieving weather data for {sanitizedLocation}. Please try again.";
                 }
             }
         }
