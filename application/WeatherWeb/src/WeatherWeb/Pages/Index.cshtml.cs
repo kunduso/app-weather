@@ -25,9 +25,18 @@ namespace WeatherWeb.Pages
         {
             if (!string.IsNullOrEmpty(location))
             {
+                // Validate location contains only safe characters
+                if (location.Any(c => char.IsControl(c) && c != ' '))
+                {
+                    ErrorMessage = "Location contains invalid characters";
+                    return;
+                }
+                
                 Location = location;
                 try
                 {
+                    _logger.LogInformation("Processing weather request for location: {Location}", SanitizeForDisplay(location));
+                    
                     Weather = await _weatherService.GetWeatherForLocation(location);
                     if (Weather == null)
                     {
@@ -36,8 +45,16 @@ namespace WeatherWeb.Pages
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error getting weather for location: {Location}", SanitizeForDisplay(location));
-                    ErrorMessage = $"Error retrieving weather data for {SanitizeForDisplay(location)}";
+                    var sanitizedLocation = SanitizeForDisplay(location);
+                    _logger.LogError(ex, "Error processing weather request for location: {Location}", sanitizedLocation);
+                    
+                    // Provide more specific error messages based on exception type
+                    ErrorMessage = ex switch
+                    {
+                        HttpRequestException => $"Unable to connect to weather service for {sanitizedLocation}. Please check your internet connection and try again.",
+                        TaskCanceledException => $"Request timed out while getting weather data for {sanitizedLocation}. Please try again.",
+                        _ => $"Error retrieving weather data for {sanitizedLocation}. Please try again."
+                    };
                 }
             }
         }
