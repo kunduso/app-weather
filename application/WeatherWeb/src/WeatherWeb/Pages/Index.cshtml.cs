@@ -22,8 +22,25 @@ namespace WeatherWeb.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public async Task OnGet(string? location = null)
         {
+            if (!string.IsNullOrEmpty(location))
+            {
+                Location = location;
+                try
+                {
+                    Weather = await _weatherService.GetWeatherForLocation(location);
+                    if (Weather == null)
+                    {
+                        ErrorMessage = $"Unable to fetch weather for {SanitizeForDisplay(location)}";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error getting weather for location: {Location}", SanitizeForDisplay(location));
+                    ErrorMessage = $"Error retrieving weather data for {SanitizeForDisplay(location)}";
+                }
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -47,10 +64,13 @@ namespace WeatherWeb.Pages
                         var sanitizedLocation = SanitizeForDisplay(Location);
                         ErrorMessage = $"Unable to fetch weather for {sanitizedLocation}";
                         _logger.LogWarning("No weather data returned for location: {Location}", sanitizedLocation);
+                        return Page();
                     }
                     else
                     {
                         _logger.LogInformation("Successfully retrieved weather data for location: {Location}", SanitizeForDisplay(Location));
+                        // Redirect after successful POST to prevent form resubmission
+                        return RedirectToPage(new { location = Location });
                     }
                 }
                 catch (Exception ex)
@@ -65,6 +85,7 @@ namespace WeatherWeb.Pages
                         TaskCanceledException => $"Request timed out while getting weather data for {sanitizedLocation}. Please try again.",
                         _ => $"Error retrieving weather data for {sanitizedLocation}. Please try again."
                     };
+                    return Page();
                 }
             }
             return Page();
