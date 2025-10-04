@@ -26,7 +26,7 @@ namespace WeatherWeb.Pages
         {
         }
 
-        public async Task OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!string.IsNullOrEmpty(Location))
             {
@@ -36,7 +36,7 @@ namespace WeatherWeb.Pages
                     if (Location.Any(c => char.IsControl(c) && c != ' '))
                     {
                         ErrorMessage = "Location contains invalid characters";
-                        return;
+                        return Page();
                     }
                     
                     _logger.LogInformation("Processing weather request for location: {Location}", SanitizeForDisplay(Location));
@@ -67,6 +67,7 @@ namespace WeatherWeb.Pages
                     };
                 }
             }
+            return Page();
         }
         
         private static string SanitizeForDisplay(string? input)
