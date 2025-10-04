@@ -10,7 +10,6 @@ namespace WeatherWeb.Pages
         private readonly WeatherService _weatherService;
         private readonly ILogger<IndexModel> _logger;
 
-        [BindProperty]
         public string Location { get; set; }
         
         public WeatherData? Weather { get; set; }
@@ -43,53 +42,7 @@ namespace WeatherWeb.Pages
             }
         }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            if (!string.IsNullOrEmpty(Location))
-            {
-                try
-                {
-                    // Validate location contains only safe characters
-                    if (Location.Any(c => char.IsControl(c) && c != ' '))
-                    {
-                        ErrorMessage = "Location contains invalid characters";
-                        return Page();
-                    }
-                    
-                    _logger.LogInformation("Processing weather request for location: {Location}", SanitizeForDisplay(Location));
-                    
-                    Weather = await _weatherService.GetWeatherForLocation(Location);
-                    if (Weather == null)
-                    {
-                        var sanitizedLocation = SanitizeForDisplay(Location);
-                        ErrorMessage = $"Unable to fetch weather for {sanitizedLocation}";
-                        _logger.LogWarning("No weather data returned for location: {Location}", sanitizedLocation);
-                        return Page();
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Successfully retrieved weather data for location: {Location}", SanitizeForDisplay(Location));
-                        // Redirect after successful POST to prevent form resubmission
-                        return RedirectToPage(new { location = Location });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var sanitizedLocation = SanitizeForDisplay(Location);
-                    _logger.LogError(ex, "Error processing weather request for location: {Location}", sanitizedLocation);
-                    
-                    // Provide more specific error messages based on exception type
-                    ErrorMessage = ex switch
-                    {
-                        HttpRequestException => $"Unable to connect to weather service for {sanitizedLocation}. Please check your internet connection and try again.",
-                        TaskCanceledException => $"Request timed out while getting weather data for {sanitizedLocation}. Please try again.",
-                        _ => $"Error retrieving weather data for {sanitizedLocation}. Please try again."
-                    };
-                    return Page();
-                }
-            }
-            return Page();
-        }
+
         
         private static string SanitizeForDisplay(string? input)
         {
