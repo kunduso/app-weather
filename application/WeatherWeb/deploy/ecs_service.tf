@@ -20,22 +20,6 @@ resource "aws_ecs_service" "service" {
   service_connect_configuration {
     enabled   = true
     namespace = local.infra_output["service_namespace_arn"]
-    service {
-      port_name      = "http"
-      discovery_name = "${var.name}-web"
-      client_alias {
-        port     = 8081
-        dns_name = "${var.name}-web"
-      }
-    }
-    service {
-      port_name = "api"
-      client_alias {
-        port     = 8080
-        dns_name = "${var.name}-api"
-      }
-    }
-
     log_configuration {
       log_driver = "awslogs"
       options = {
